@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harness engineering con agentes de programación — Apuntes — Learnby-do</title>
+<style>
+/* ==========================================================================
+   Learnby-do — Hoja de estilos para documentación HTML
+   Marca: Learnby-do (CAR de formación tecnológica de Cuatroochenta)
+   Colores del logo: Rojo #FF4950 sobre negro #141414 / blanco
+   Tipografía corporativa: Figtree (fallback Poppins → Montserrat → sans)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  /* Marca */
+  --lbd-red: #ff4950;          /* Acento principal (el "do" del logo) */
+  --lbd-red-dark: #e03a41;     /* Hover / estados activos */
+  --lbd-red-soft: #fff0f0;     /* Fondos de destacado suaves */
+  --lbd-black: #141414;        /* Fondo oscuro / texto de máximo contraste */
+  --lbd-white: #ffffff;
+
+  /* Neutros (compartidos con la guía 480) */
+  --lbd-gray: #4d4d4d;
+  --lbd-text: #333333;
+  --lbd-text-soft: #888888;
+  --lbd-bg-alt: #f7f8fa;
+  --lbd-border: #e5e7eb;
+  --lbd-border-dark: #2a2a2a;
+
+  /* Tipografía y ritmo */
+  --lbd-font: 'Figtree', 'Poppins', 'Montserrat', system-ui, sans-serif;
+  --lbd-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  --lbd-radius: 10px;
+  --lbd-maxw: 860px;
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--lbd-font);
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--lbd-text);
+  background: var(--lbd-white);
+  -webkit-font-smoothing: antialiased;
+}
+
+main, .lbd-container {
+  max-width: var(--lbd-maxw);
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+/* ---------- Cabecera de documento (banda oscura del logo inverso) ---------- */
+.lbd-header {
+  background: var(--lbd-black);
+  color: var(--lbd-white);
+  padding: 2.5rem 1.5rem;
+}
+.lbd-header .lbd-container { padding: 0; }
+.lbd-header img.lbd-logo { height: 64px; width: auto; display: block; margin-bottom: 1.25rem; }
+.lbd-header h1 { color: var(--lbd-white); border: none; margin: 0 0 .25rem; }
+.lbd-header .lbd-subtitle { color: #bdbdbd; font-size: 1.05rem; font-weight: 300; margin: 0; }
+.lbd-header .lbd-meta { color: var(--lbd-text-soft); font-size: .85rem; margin-top: 1rem; }
+
+/* ---------- Títulos ---------- */
+h1, h2, h3, h4 { font-family: var(--lbd-font); color: var(--lbd-black); line-height: 1.25; font-weight: 700; }
+
+h1 { font-size: 2.1rem; letter-spacing: -0.02em; }
+
+h2 {
+  font-size: 1.5rem;
+  margin-top: 2.75rem;
+  padding-bottom: .45rem;
+  border-bottom: 3px solid var(--lbd-red);   /* línea de acento roja */
+  display: inline-block;
+  border-image: linear-gradient(90deg, var(--lbd-red) 0 60px, var(--lbd-border) 60px) 1;
+  border-image-width: 0 0 3px 0;
+  display: block;
+}
+
+h3 { font-size: 1.2rem; margin-top: 2rem; }
+h3::before { content: "› "; color: var(--lbd-red); font-weight: 800; }
+
+h4 { font-size: 1rem; color: var(--lbd-gray); text-transform: uppercase; letter-spacing: .05em; }
+
+/* ---------- Texto ---------- */
+p { margin: 0.9rem 0; }
+a { color: var(--lbd-red); text-decoration: none; font-weight: 600; }
+a:hover { color: var(--lbd-red-dark); text-decoration: underline; }
+strong { color: var(--lbd-black); }
+small, .lbd-caption { color: var(--lbd-text-soft); font-size: .85rem; }
+hr { border: none; border-top: 1px solid var(--lbd-border); margin: 2.5rem 0; }
+
+ul, ol { padding-left: 1.4rem; }
+li { margin: .35rem 0; }
+ul li::marker { color: var(--lbd-red); }
+
+blockquote {
+  margin: 1.5rem 0;
+  padding: .9rem 1.25rem;
+  border-left: 4px solid var(--lbd-red);
+  background: var(--lbd-bg-alt);
+  border-radius: 0 var(--lbd-radius) var(--lbd-radius) 0;
+  color: var(--lbd-gray);
+  font-style: italic;
+}
+
+/* ---------- Código ---------- */
+code {
+  font-family: var(--lbd-mono);
+  font-size: .85em;
+  background: var(--lbd-bg-alt);
+  border: 1px solid var(--lbd-border);
+  border-radius: 5px;
+  padding: .12em .4em;
+  color: var(--lbd-red-dark);
+}
+
+pre {
+  background: var(--lbd-black);
+  color: #f2f2f2;
+  border-radius: var(--lbd-radius);
+  padding: 1.1rem 1.25rem;
+  overflow-x: auto;
+  border-left: 4px solid var(--lbd-red);
+  font-size: .875rem;
+  line-height: 1.55;
+}
+pre code { background: none; border: none; color: inherit; padding: 0; }
+
+/* ---------- Tablas ---------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: .92rem;
+}
+th {
+  background: var(--lbd-black);
+  color: var(--lbd-white);
+  text-align: left;
+  padding: .6rem .8rem;
+  font-weight: 600;
+}
+th:first-child { border-radius: 8px 0 0 0; }
+th:last-child { border-radius: 0 8px 0 0; }
+td { padding: .55rem .8rem; border-bottom: 1px solid var(--lbd-border); }
+tbody tr:nth-child(even) { background: var(--lbd-bg-alt); }
+tbody tr:hover { background: var(--lbd-red-soft); }
+
+/* ---------- Componentes ---------- */
+/* Tarjetas */
+.lbd-card {
+  background: var(--lbd-white);
+  border: 1px solid var(--lbd-border);
+  border-radius: var(--lbd-radius);
+  padding: 1.25rem 1.4rem;
+  box-shadow: 0 2px 8px rgba(20, 20, 20, .06);
+  margin: 1.25rem 0;
+}
+.lbd-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+
+/* Avisos */
+.lbd-note, .lbd-warning, .lbd-success {
+  border-radius: var(--lbd-radius);
+  padding: .9rem 1.2rem;
+  margin: 1.25rem 0;
+  border-left: 4px solid;
+}
+.lbd-note    { background: var(--lbd-bg-alt);  border-color: var(--lbd-gray); }
+.lbd-warning { background: var(--lbd-red-soft); border-color: var(--lbd-red); }
+.lbd-success { background: #f0fdf6; border-color: #39c67f; }
+
+/* Etiquetas y KPIs */
+.lbd-badge {
+  display: inline-block;
+  background: var(--lbd-red);
+  color: var(--lbd-white);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: .2em .7em;
+  border-radius: 999px;
+}
+.lbd-badge--dark { background: var(--lbd-black); }
+.lbd-kpi { font-size: 2.4rem; font-weight: 800; color: var(--lbd-red); line-height: 1; }
+.lbd-kpi + .lbd-caption { display: block; margin-top: .3rem; }
+
+/* Botón */
+.lbd-btn {
+  display: inline-block;
+  background: var(--lbd-red);
+  color: var(--lbd-white) !important;
+  font-weight: 700;
+  padding: .65rem 1.5rem;
+  border-radius: 999px;
+  transition: background .15s ease;
+}
+.lbd-btn:hover { background: var(--lbd-red-dark); text-decoration: none; }
+
+/* Índice / TOC */
+.lbd-toc { background: var(--lbd-bg-alt); border-radius: var(--lbd-radius); padding: 1.2rem 1.5rem; }
+.lbd-toc ol { margin: .5rem 0 0; counter-reset: toc; list-style: none; padding-left: 0; }
+.lbd-toc li { counter-increment: toc; margin: .4rem 0; }
+.lbd-toc li::before { content: counter(toc, decimal-leading-zero); color: var(--lbd-red); font-weight: 800; margin-right: .6rem; font-size: .85rem; }
+
+/* Pie de documento */
+.lbd-footer {
+  background: var(--lbd-black);
+  color: var(--lbd-text-soft);
+  text-align: center;
+  font-size: .8rem;
+  padding: 1.75rem 1rem;
+  margin-top: 3rem;
+}
+.lbd-footer img { height: 30px; opacity: .9; display: block; margin: 0 auto .6rem; }
+
+/* ---------- Impresión ---------- */
+@media print {
+  .lbd-header, .lbd-footer, pre, th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-size: 11pt; }
+  a { color: var(--lbd-text); }
+}
+
+@media (max-width: 640px) {
+  body { font-size: 15px; }
+  h1 { font-size: 1.7rem; }
+  main, .lbd-container { padding: 1.75rem 1.1rem 3rem; }
+}
+
+/* ---------- Complementos para estos apuntes (solo negro, blanco y rojo) ---------- */
+:root { color-scheme: light; }
+:focus-visible { outline: 2px solid var(--lbd-red); outline-offset: 3px; }
+.lbd-header .lbd-badge { margin-bottom: .2rem; }
+.lbd-toc ol { columns: 2 16em; column-gap: 2rem; }
+.lbd-toc li { break-inside: avoid; margin: 0; padding: .2rem 0; }
+.lbd-toc a { color: var(--lbd-text); font-weight: 500; }
+.lbd-toc a:hover { color: var(--lbd-red); }
+.lbd-table-wrap { overflow-x: auto; }
+td { vertical-align: top; }
+.lbd-card-grid { margin: 1.25rem 0; }
+.lbd-card-grid .lbd-card { margin: 0; }
+.lbd-card--soft { background: var(--lbd-bg-alt); box-shadow: none; }
+.lbd-card--accent { border-top: 4px solid var(--lbd-red); }
+.lbd-card h4 { margin: .2rem 0 .4rem; }
+.lbd-info { border-radius: var(--lbd-radius); padding: .9rem 1.2rem; margin: 1.25rem 0; background: var(--lbd-white); border: 1px solid var(--lbd-border); border-left: 4px solid var(--lbd-black); }
+.lbd-pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.75rem 0; }
+.lbd-pillar { padding: 1.3rem 1.2rem; border-radius: var(--lbd-radius); border: 1px solid var(--lbd-border); }
+.lbd-pillar strong { display: block; font-size: 1.15rem; margin-bottom: .4rem; }
+.lbd-pillar--dark { background: var(--lbd-black); border-color: var(--lbd-black); color: #ddd; }
+.lbd-pillar--dark strong { color: var(--lbd-white); }
+.lbd-pillar--line { border-top: 4px solid var(--lbd-black); }
+.lbd-pillar--red { background: var(--lbd-red-soft); border-color: var(--lbd-red-soft); border-top: 4px solid var(--lbd-red); }
+.lbd-figure { margin: 2rem 0; text-align: center; }
+.lbd-figure svg { max-width: 100%; height: auto; }
+.lbd-figure figcaption { color: var(--lbd-text-soft); font-size: .85rem; margin-top: .5rem; }
+dl dt { font-weight: 700; color: var(--lbd-black); margin-top: .9rem; }
+dl dt::before { content: "› "; color: var(--lbd-red); }
+dl dd { margin: .2rem 0 0 1rem; }
+.lbd-header img.lbd-logo { height: 64px; width: auto; aspect-ratio: 300/196.08; }
+.lbd-footer img { width: auto; aspect-ratio: 300/196.08; }
+@media print { .lbd-pillar--dark, .lbd-badge, .lbd-warning, .lbd-note, .lbd-info, .lbd-pillar--red { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<header class="lbd-header">
+  <div class="lbd-container">
+    <img class="lbd-logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4gPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGlkPSJMYXllcl8xIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE5Ni4wOCIgdmlld0JveD0iMCAwIDMwMCAxOTYuMDgiPjxwYXRoIGQ9Ik0xOC42Miw2Mi4wN2gyNC4zOXYxNC4zN0gwVjBIMTguNjJWNjIuMDdaIiBmaWxsPSIjZmZmIj48L3BhdGg+PHBhdGggZD0iTTEwOC44OSw1MC41M2gtNDIuMTRjLjI5LDMuNzgsMS41MSw2LjY2LDMuNjUsOC42NiwyLjE0LDIsNC43NywyLjk5LDcuOSwyLjk5LDQuNjQsMCw3Ljg4LTEuOTYsOS42OS01Ljg4aDE5LjgyYy0xLjAyLDMuOTktMi44NSw3LjU5LTUuNSwxMC43OC0yLjY1LDMuMi01Ljk3LDUuNy05Ljk2LDcuNTEtMy45OSwxLjgyLTguNDYsMi43Mi0xMy4zOSwyLjcyLTUuOTUsMC0xMS4yNS0xLjI3LTE1LjktMy44MS00LjY1LTIuNTQtOC4yOC02LjE3LTEwLjg5LTEwLjg5LTIuNjEtNC43Mi0zLjkyLTEwLjI0LTMuOTItMTYuNTVzMS4yOS0xMS44MywzLjg3LTE2LjU1YzIuNTgtNC43Miw2LjE5LTguMzUsMTAuODQtMTAuODksNC42NS0yLjU0LDkuOTgtMy44MSwxNi4wMS0zLjgxczExLjExLDEuMjMsMTUuNjgsMy43YzQuNTcsMi40Nyw4LjE1LDUuOTksMTAuNzMsMTAuNTYsMi41OCw0LjU3LDMuODcsOS45MSwzLjg3LDE2LjAxLDAsMS43NC0uMTEsMy41Ni0uMzMsNS40NFptLTE4LjczLTEwLjM0YzAtMy4xOS0xLjA5LTUuNzMtMy4yNy03LjYyLTIuMTgtMS44OS00LjktMi44My04LjE3LTIuODNzLTUuNzYsLjkxLTcuODksMi43MmMtMi4xNCwxLjgyLTMuNDcsNC4zOS0zLjk4LDcuNzNoMjMuM1oiIGZpbGw9IiNmZmYiPjwvcGF0aD48cGF0aCBkPSJNMTE4Ljg2LDI5LjUxYzIuMzYtNC43Miw1LjU3LTguMzUsOS42NC0xMC44OSw0LjA2LTIuNTQsOC42LTMuODEsMTMuNjEtMy44MSw0LjI4LDAsOC4wNCwuODcsMTEuMjcsMi42MSwzLjIzLDEuNzQsNS43Miw0LjAzLDcuNDYsNi44NlYxNS42OGgxOC42MnY2MC43NmgtMTguNjJ2LTguNmMtMS44MiwyLjgzLTQuMzQsNS4xMi03LjU3LDYuODYtMy4yMywxLjc0LTYuOTksMi42MS0xMS4yNywyLjYxLTQuOTQsMC05LjQ0LTEuMjktMTMuNS0zLjg3LTQuMDctMi41OC03LjI4LTYuMjQtOS42NC0xMS0yLjM2LTQuNzUtMy41NC0xMC4yNS0zLjU0LTE2LjVzMS4xOC0xMS43MiwzLjU0LTE2LjQ0Wm0zOC4xMSw1LjU1Yy0yLjU4LTIuNjgtNS43Mi00LjAzLTkuNDItNC4wM3MtNi44NCwxLjMyLTkuNDIsMy45N2MtMi41OCwyLjY1LTMuODcsNi4zLTMuODcsMTAuOTRzMS4yOSw4LjMzLDMuODcsMTEuMDVjMi41OCwyLjcyLDUuNzIsNC4wOCw5LjQyLDQuMDhzNi44NC0xLjM0LDkuNDItNC4wM2MyLjU4LTIuNjksMy44Ny02LjM1LDMuODctMTFzLTEuMjktOC4zMS0zLjg3LTExWiIgZmlsbD0iI2ZmZiI+PC9wYXRoPjxwYXRoIGQ9Ik0yMTkuNzUsMTcuOTFjMy4yNy0xLjkyLDYuOS0yLjg5LDEwLjg5LTIuODl2MTkuNzFoLTUuMTJjLTQuNjUsMC04LjEzLDEtMTAuNDUsMy0yLjMyLDItMy40OCw1LjUtMy40OCwxMC41MXYyOC4yaC0xOC42MlYxNS42OGgxOC42MnYxMC4xM2MyLjE4LTMuMzQsNC45LTUuOTcsOC4xNy03Ljg5WiIgZmlsbD0iI2ZmZiI+PC9wYXRoPjxwYXRoIGQ9Ik0yOTMuNjMsMjEuOTRjNC4yNSw0LjYxLDYuMzcsMTAuOTQsNi4zNywxOXYzNS41aC0xOC41MVY0My40NWMwLTQuMDYtMS4wNS03LjIyLTMuMTYtOS40Ny0yLjExLTIuMjUtNC45NC0zLjM4LTguNDktMy4zOHMtNi4zOSwxLjEzLTguNDksMy4zOGMtMi4xMSwyLjI1LTMuMTYsNS40MS0zLjE2LDkuNDd2MzNoLTE4LjYyVjE1LjY4aDE4LjYydjguMDZjMS44OS0yLjY5LDQuNDMtNC44MSw3LjYyLTYuMzcsMy4xOS0xLjU2LDYuNzktMi4zNCwxMC43OC0yLjM0LDcuMTEsMCwxMi43OSwyLjMxLDE3LjA0LDYuOTFaIiBmaWxsPSIjZmZmIj48L3BhdGg+PHBhdGggZD0iTTI2LjEzLDExMi44N2MzLjI3LTEuNzQsNy4wMS0yLjYxLDExLjIyLTIuNjEsNS4wMSwwLDkuNTUsMS4yNywxMy42MSwzLjgxLDQuMDYsMi41NCw3LjI4LDYuMTcsOS42NCwxMC44OSwyLjM2LDQuNzIsMy41NCwxMC4yLDMuNTQsMTYuNDRzLTEuMTgsMTEuNzQtMy41NCwxNi41Yy0yLjM2LDQuNzYtNS41Nyw4LjQyLTkuNjQsMTEtNC4wNywyLjU4LTguNiwzLjg3LTEzLjYxLDMuODctNC4yOCwwLTguMDItLjg1LTExLjIyLTIuNTYtMy4xOS0xLjctNS43LTMuOTctNy41MS02LjgxdjguNDlIMFY5MS4zMUgxOC42MnYyOC40MmMxLjc0LTIuODMsNC4yNS01LjEyLDcuNTEtNi44NlptMTUuMTksMTcuNTljLTIuNTgtMi42NS01Ljc2LTMuOTctOS41My0zLjk3cy02Ljg0LDEuMzQtOS40Miw0LjAzYy0yLjU4LDIuNjktMy44Nyw2LjM1LTMuODcsMTFzMS4yOSw4LjMxLDMuODcsMTFjMi41OCwyLjY5LDUuNzIsNC4wMyw5LjQyLDQuMDNzNi44Ni0xLjM2LDkuNDctNC4wOGMyLjYxLTIuNzIsMy45Mi02LjQxLDMuOTItMTEuMDVzLTEuMjktOC4yOS0zLjg3LTEwLjk0WiIgZmlsbD0iI2ZmZiI+PC9wYXRoPjxwb2x5Z29uIHBvaW50cz0iMTM2LjAxIDExMS4xMyAxMTUuODYgMTExLjEzIDEwMS45MiAxNDkuMTMgODcuODggMTExLjEzIDY3LjA4IDExMS4xMyA5MS44IDE2OS44MiA3OS45NiAxOTYuMDggOTkuODggMTk2LjA4IDEzNi4wMSAxMTEuMTMiIGZpbGw9IiNmZmYiPjwvcG9seWdvbj48cGF0aCBkPSJNMTQyLjU5LDEyNC45NmMyLjM2LTQuNzIsNS41Ny04LjM1LDkuNjQtMTAuODksNC4wNi0yLjU0LDguNi0zLjgxLDEzLjYxLTMuODEsMy45OSwwLDcuNjQsLjg0LDEwLjk0LDIuNSwzLjMsMS42Nyw1LjksMy45Miw3Ljc5LDYuNzV2LTI4LjJoMTguNjJ2ODAuNThoLTE4LjYydi04LjcxYy0xLjc0LDIuOS00LjIzLDUuMjMtNy40Niw2Ljk3LTMuMjMsMS43NC02Ljk5LDIuNjEtMTEuMjcsMi42MS01LjAxLDAtOS41NS0xLjI5LTEzLjYxLTMuODctNC4wNy0yLjU4LTcuMjgtNi4yNC05LjY0LTExLTIuMzYtNC43NS0zLjU0LTEwLjI1LTMuNTQtMTYuNXMxLjE4LTExLjcyLDMuNTQtMTYuNDRabTM4LjExLDUuNTVjLTIuNTgtMi42OS01LjcyLTQuMDMtOS40Mi00LjAzcy02Ljg0LDEuMzMtOS40MiwzLjk3Yy0yLjU4LDIuNjUtMy44Nyw2LjMtMy44NywxMC45NHMxLjI5LDguMzMsMy44NywxMS4wNWMyLjU4LDIuNzIsNS43Miw0LjA4LDkuNDIsNC4wOHM2Ljg0LTEuMzQsOS40Mi00LjAzYzIuNTgtMi42OSwzLjg3LTYuMzUsMy44Ny0xMXMtMS4yOS04LjMxLTMuODctMTFaIiBmaWxsPSIjZmY0OTUwIj48L3BhdGg+PHBhdGggZD0iTTIyNy40NCwxNjkuMTZjLTQuNDktMi40LTguMDItNS44My0xMC41OS0xMC4yOC0yLjU3LTQuNDUtMy44Ni05LjY2LTMuODYtMTUuNjNzMS4zLTExLjA5LDMuOTEtMTUuNThjMi42LTQuNDksNi4xNy03LjkzLDEwLjY5LTEwLjMzLDQuNTItMi40LDkuNi0zLjYsMTUuMjItMy42czEwLjY5LDEuMiwxNS4yMiwzLjZjNC41MiwyLjQsOC4wOSw1Ljg0LDEwLjY5LDEwLjMzLDIuNiw0LjQ5LDMuOTEsOS42OCwzLjkxLDE1LjU4cy0xLjMyLDExLjA5LTMuOTYsMTUuNThjLTIuNjQsNC40OS02LjI0LDcuOTMtMTAuOCwxMC4zMy00LjU2LDIuNC05LjY1LDMuNi0xNS4yNywzLjZzLTEwLjY4LTEuMi0xNS4xNy0zLjZabTIzLjc1LTE1LjMyYzIuMzYtMi40NywzLjU1LTYsMy41NS0xMC41OXMtMS4xNS04LjEyLTMuNDQtMTAuNTljLTIuMy0yLjQ3LTUuMTItMy43LTguNDgtMy43cy02LjI3LDEuMjItOC41MywzLjY1Yy0yLjI2LDIuNDMtMy4zOSw1Ljk4LTMuMzksMTAuNjRzMS4xMSw4LjEyLDMuMzQsMTAuNTljMi4yMywyLjQ3LDUuMDIsMy43LDguMzgsMy43czYuMjItMS4yMyw4LjU5LTMuN1oiIGZpbGw9IiNmZjQ5NTAiPjwvcGF0aD48cGF0aCBkPSJNMjE2Ljc5LDEwNS43OHYtMTQuNDdoNTIuMDN2MTQuNDdoLTUyLjAzWiIgZmlsbD0iI2ZmNDk1MCI+PC9wYXRoPjwvc3ZnPiA=" alt="Learnby-do">
+    <p style="margin:0 0 .6rem"><span class="lbd-badge">Apuntes · Introducción</span></p>
+    <h1>Harness engineering con agentes de programación</h1>
+    <p class="lbd-subtitle">Cómo construir el entorno que hace fiable el código de un agente</p>
+    <p class="lbd-meta">Versión 1.1 · noviembre de 2026 · Jano</p>
+  </div>
+</header>
+
+<main>
+
+<nav class="lbd-toc">
+  <strong>Contenido</strong>
+  <ol>
+    <li><a href="#s1">Qué es un harness</a></li>
+    <li><a href="#s2">De prompt a contexto a harness</a></li>
+    <li><a href="#s3">Por qué falla un agente sin harness</a></li>
+    <li><a href="#s4">Guías, sensores y límites</a></li>
+    <li><a href="#s5">Principios del harness engineering</a></li>
+    <li><a href="#s6">Las piezas del harness</a></li>
+    <li><a href="#s7">Flujo de trabajo con harness</a></li>
+    <li><a href="#s8">Mantener el harness</a></li>
+    <li><a href="#s9">Errores frecuentes</a></li>
+    <li><a href="#s10">Glosario</a></li>
+    <li><a href="#s11">Para saber más</a></li>
+  </ol>
+</nav>
+
+<div class="lbd-info">Estos apuntes explican qué es el harness engineering y cómo aplicarlo en cualquier proyecto en el que programes con un agente. No necesitas conocimientos previos sobre el tema. Los ejemplos son independientes: cada uno se explica donde aparece.</div>
+
+<!-- ============================================================ -->
+<h2 id="s1">1. Qué es un harness</h2>
+
+<p>Un agente de programación es un modelo de lenguaje que trabaja en bucle: lee archivos, decide, edita, ejecuta comandos y vuelve a decidir. El modelo pone el razonamiento. Todo lo demás es el harness.</p>
+
+<blockquote>Agente = modelo + harness. Si no eres el modelo, eres el harness.</blockquote>
+
+<p>«Harness» significa arnés. La imagen ayuda: un caballo tiene la fuerza, pero el arnés decide hacia dónde va esa fuerza y evita que se desboque. El harness es el conjunto de instrucciones, herramientas, límites y comprobaciones que rodean al modelo.</p>
+
+<h3>Dos harness distintos</h3>
+<div class="lbd-card-grid">
+  <div class="lbd-card lbd-card--soft">
+    <h4>Harness del fabricante</h4>
+    <p>Lo construye quien crea la herramienta. Por ejemplo: el prompt de sistema, las herramientas de lectura y edición, la gestión del contexto. No lo controlas.</p>
+  </div>
+  <div class="lbd-card lbd-card--accent">
+    <h4>Harness del usuario</h4>
+    <p>Lo construyes tú alrededor de tu proyecto: AGENTS.md, tests, hooks, permisos, comandos. Es específico de tu código y tus convenciones. Es de lo que tratan estos apuntes.</p>
+  </div>
+</div>
+
+<p>El harness engineering es la práctica de diseñar y mantener ese harness del usuario para que el resultado del agente sea fiable. El término se popularizó a principios de 2026, cuando los agentes empezaron a escribir la mayor parte del código en muchos equipos.</p>
+
+<h3>Por qué importa tanto</h3>
+<p>Con el mismo modelo, un buen harness cambia mucho el resultado. Hay equipos que han mejorado de forma notable la posición de su agente en benchmarks públicos sin cambiar de modelo, solo ajustando el harness. La consecuencia práctica: cuando el agente falla, la primera pregunta no es «¿qué modelo uso?», sino «¿qué le faltaba al entorno?».</p>
+
+<!-- ============================================================ -->
+<h2 id="s2">2. De prompt a contexto a harness</h2>
+
+<p>Trabajar con modelos de lenguaje ha pasado por tres etapas. Cada una amplía la anterior, no la sustituye.</p>
+
+<div class="lbd-table-wrap"><table>
+  <thead><tr><th>Etapa</th><th>Pregunta que responde</th><th>Qué se diseña</th><th>Ejemplo</th></tr></thead>
+  <tbody>
+    <tr><td>Prompt engineering</td><td>¿Cómo pido?</td><td>La redacción del encargo</td><td>«Actúa como desarrollador sénior y…»</td></tr>
+    <tr><td>Context engineering</td><td>¿Qué ve el modelo?</td><td>La información que entra en la ventana de contexto</td><td>Adjuntar los casos de uso y el esquema de datos</td></tr>
+    <tr><td>Harness engineering</td><td>¿En qué entorno trabaja y cómo se le corrige?</td><td>Instrucciones persistentes, herramientas, límites y bucles de verificación</td><td>Un hook que lanza los tests y devuelve el error al agente</td></tr>
+  </tbody>
+</table></div>
+
+<p>Un prompt sirve para una conversación. El contexto sirve para una tarea. El harness sirve para todas las tareas de un proyecto, durante meses, con varias personas.</p>
+
+<!-- ============================================================ -->
+<h2 id="s3">3. Por qué falla un agente sin harness</h2>
+
+<p>Los fallos de un agente casi nunca son de inteligencia. Son de información y de comprobación. Estas son las causas más habituales.</p>
+
+<dl>
+  <dt>No conoce tu proyecto</dt>
+  <dd>Cada sesión empieza de cero. No sabe tu estructura de carpetas, tus convenciones ni tus reglas de negocio. Si no se lo dices, las inventa.</dd>
+  <dt>Decide sin preguntar</dt>
+  <dd>Ante una ambigüedad, el agente elige la opción más probable y sigue. Esa opción puede ser razonable en general y equivocada en tu proyecto.</dd>
+  <dt>No comprueba su trabajo</dt>
+  <dd>Si nada le obliga, puede decir «hecho» sin compilar ni ejecutar los tests. A veces escribe tests que pasan porque prueban poco.</dd>
+  <dt>Su contexto es limitado</dt>
+  <dd>La ventana de contexto se llena con archivos, salidas de comandos y conversación. En sesiones largas, las instrucciones del principio pierden peso.</dd>
+  <dt>Las instrucciones largas no escalan</dt>
+  <dd>Añadir más y más reglas al prompt empeora el resultado. Las reglas del final se cumplen peor y unas contradicen a otras.</dd>
+</dl>
+
+<div class="lbd-warning"><strong>Ejemplo.</strong> Tienes una aplicación de reservas para un gimnasio y pides al agente: «añade la opción de cancelar una reserva». No le dices que en ese gimnasio solo se puede cancelar hasta 2 horas antes de la clase. El agente permite cancelar en cualquier momento, escribe un test que solo comprueba que la función existe y dice que está terminado. Ninguno de esos fallos se arregla con un prompt más educado: al agente le faltaba información y nada comprobaba su trabajo.</div>
+
+<!-- ============================================================ -->
+<h2 id="s4">4. Guías, sensores y límites</h2>
+
+<p>Las piezas de un harness se agrupan en tres tipos según cuándo actúan.</p>
+
+<figure class="lbd-figure">
+<svg viewBox="0 0 760 270" xmlns="http://www.w3.org/2000/svg" font-family="Figtree, Poppins, Montserrat, Helvetica Neue, Arial, sans-serif" role="img" aria-label="Bucle de guías, agente y sensores">
+  <defs>
+    <marker id="ah" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333333"/></marker>
+    <marker id="ahp" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333333"/></marker>
+  </defs>
+  <rect x="10" y="40" width="200" height="120" rx="12" fill="#F7F8FA" stroke="#141414" stroke-width="2"/>
+  <text x="110" y="75" text-anchor="middle" font-weight="700" font-size="18" fill="#333333">Guías</text>
+  <text x="110" y="100" text-anchor="middle" font-size="13" fill="#4D4D4D">antes de actuar</text>
+  <text x="110" y="122" text-anchor="middle" font-size="12" fill="#888888">AGENTS.md, comandos,</text>
+  <text x="110" y="140" text-anchor="middle" font-size="12" fill="#888888">skills, documentación</text>
+
+  <rect x="280" y="40" width="200" height="120" rx="12" fill="#141414"/>
+  <text x="380" y="88" text-anchor="middle" font-weight="700" font-size="20" fill="#ffffff">Agente</text>
+  <text x="380" y="114" text-anchor="middle" font-size="13" fill="#FF4950">planifica, edita, ejecuta</text>
+
+  <rect x="550" y="40" width="200" height="120" rx="12" fill="#FFFFFF" stroke="#141414" stroke-width="2"/>
+  <text x="650" y="75" text-anchor="middle" font-weight="700" font-size="18" fill="#333333">Sensores</text>
+  <text x="650" y="100" text-anchor="middle" font-size="13" fill="#4D4D4D">después de actuar</text>
+  <text x="650" y="122" text-anchor="middle" font-size="12" fill="#888888">análisis estático, tests,</text>
+  <text x="650" y="140" text-anchor="middle" font-size="12" fill="#888888">hooks, revisor</text>
+
+  <line x1="212" y1="100" x2="276" y2="100" stroke="#333333" stroke-width="2.5" marker-end="url(#ah)"/>
+  <line x1="482" y1="100" x2="546" y2="100" stroke="#333333" stroke-width="2.5" marker-end="url(#ah)"/>
+  <path d="M650,162 C650,225 380,225 380,166" fill="none" stroke="#333333" stroke-width="2.5" stroke-dasharray="6 5" stroke-opacity="1" marker-end="url(#ahp)"/>
+  <text x="515" y="240" text-anchor="middle" font-size="13" font-weight="600" fill="#333333">el error vuelve al agente y corrige</text>
+
+  <rect x="230" y="4" width="300" height="26" rx="13" fill="#FFF0F0" stroke="#FF4950" stroke-width="1.5"/>
+  <text x="380" y="22" text-anchor="middle" font-size="12" font-weight="600" fill="#333333">Límites: lo que el agente nunca puede hacer</text>
+</svg>
+<figcaption>Las guías orientan, los sensores comprueban y devuelven el error, los límites encierran todo el bucle.</figcaption>
+</figure>
+
+<div class="lbd-pillars">
+  <div class="lbd-pillar lbd-pillar--dark"><strong>Guías</strong>Actúan antes. Anticipan errores y dirigen el comportamiento: «así trabajamos aquí».</div>
+  <div class="lbd-pillar lbd-pillar--line"><strong>Sensores</strong>Actúan después. Detectan errores y, si están bien conectados, se los devuelven al agente para que corrija solo.</div>
+  <div class="lbd-pillar lbd-pillar--red"><strong>Límites</strong>Impiden acciones. Protegen secretos, ramas y comandos peligrosos.</div>
+</div>
+
+<h3>Por qué hacen falta los dos primeros</h3>
+<p>Con solo guías, el agente sabe lo que debe hacer, pero nadie comprueba que lo haga. Repetirá errores sin enterarse. Con solo sensores, el agente falla mucho y descubre tarde cada error, gastando tiempo y contexto. Un harness maduro combina ambos: las guías reducen los errores y los sensores atrapan los que se escapan.</p>
+
+<h3>Sensores deterministas y sensores que razonan</h3>
+<div class="lbd-table-wrap"><table>
+  <thead><tr><th>Tipo</th><th>Ejemplos</th><th>Ventajas</th><th>Inconvenientes</th></tr></thead>
+  <tbody>
+    <tr><td>Deterministas</td><td>Análisis estático, linter, tests, tests de arquitectura</td><td>Rápidos, baratos, siempre dan el mismo resultado</td><td>Solo detectan lo que se puede expresar como regla</td></tr>
+    <tr><td>Que razonan</td><td>Subagente revisor, revisión por IA de un pull request</td><td>Detectan problemas de diseño, legibilidad o intención</td><td>Más lentos, más caros, pueden equivocarse</td></tr>
+  </tbody>
+</table></div>
+<p>Regla práctica: primero los deterministas. Los que razonan van después, para lo que no se puede comprobar con una regla.</p>
+
+<!-- ============================================================ -->
+<h2 id="s5">5. Principios del harness engineering</h2>
+
+<div class="lbd-card lbd-card--accent">
+  <h4>1 · Cada regla nace de un fallo</h4>
+  <p>No se escribe un archivo de instrucciones de 300 líneas «por si acaso». Cuando el agente se equivoca, te preguntas qué le faltaba y añades eso. Cada línea del harness debería poder explicarse con un error real.</p>
+</div>
+<div class="lbd-card lbd-card--soft">
+  <h4>2 · Lo que se puede comprobar, no se pide: se comprueba</h4>
+  <p>«No escribas contraseñas ni claves en el código» en el archivo de instrucciones es una guía débil: el agente puede olvidarla. Un detector de secretos que revisa cada cambio, lanzado por un hook, es un sensor fuerte: el agente no puede saltárselo.</p>
+</div>
+<div class="lbd-card lbd-card--accent">
+  <h4>3 · El repositorio es el canal de comunicación</h4>
+  <p>Lo que no está en el repositorio, el agente no lo sabe en la siguiente sesión. Las decisiones de diseño, las convenciones y las reglas de negocio tienen que estar escritas en archivos del proyecto.</p>
+</div>
+<div class="lbd-card lbd-card--soft">
+  <h4>4 · Corrige el harness, no solo el código</h4>
+  <p>Si arreglas a mano el error del agente, el error vuelve mañana. Si arreglas el harness, no vuelve. Arreglar el código es un parche; arreglar el harness es una mejora permanente.</p>
+</div>
+<div class="lbd-card lbd-card--accent">
+  <h4>5 · Menos es más</h4>
+  <p>El contexto es un recurso limitado. Cada línea del archivo de instrucciones compite con el código que el agente necesita leer. Instrucciones cortas, concretas y verificables.</p>
+</div>
+<div class="lbd-card lbd-card--soft">
+  <h4>6 · El humano decide, el agente ejecuta</h4>
+  <p>El harness no sustituye tu criterio. Tú revisas el plan, apruebas el diseño y decides cuándo algo está bien. El harness te ahorra revisar lo que una máquina puede comprobar.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="s6">6. Las piezas del harness</h2>
+
+<p>Casi todos los agentes de programación actuales, ya sea en la terminal, en el editor o en la nube, ofrecen las mismas piezas con nombres distintos. Aquí se describen por su función. La documentación de tu herramienta te dirá cómo se llama cada una y dónde se configura.</p>
+
+<div class="lbd-table-wrap"><table>
+  <thead><tr><th>Pieza</th><th>Tipo</th><th>Para qué</th><th>Forma habitual</th></tr></thead>
+  <tbody>
+    <tr><td>Archivo de instrucciones</td><td>Guía</td><td>Contexto que se carga en cada sesión</td><td><code>AGENTS.md</code> en la raíz del repo</td></tr>
+    <tr><td>Modo plan</td><td>Guía</td><td>Planificar antes de tocar código</td><td>Un modo de solo lectura</td></tr>
+    <tr><td>Comandos reutilizables</td><td>Guía</td><td>Flujos que repites</td><td>Un archivo Markdown que se lanza con <code>/nombre</code></td></tr>
+    <tr><td>Skills</td><td>Guía</td><td>Instrucciones que se cargan cuando la tarea encaja</td><td>Una carpeta con <code>SKILL.md</code></td></tr>
+    <tr><td>Subagentes</td><td>Sensor o ejecutor</td><td>Agentes con contexto propio y tarea concreta</td><td>Un archivo con nombre, instrucciones y herramientas</td></tr>
+    <tr><td>Hooks</td><td>Sensor o límite</td><td>Comandos automáticos en momentos fijos</td><td>La configuración del agente</td></tr>
+    <tr><td>Permisos</td><td>Límite</td><td>Qué se permite, qué se pregunta, qué se prohíbe</td><td>La configuración del agente</td></tr>
+    <tr><td>Tests, análisis estático, linter</td><td>Sensor</td><td>La prueba de que el código funciona</td><td>El propio proyecto</td></tr>
+  </tbody>
+</table></div>
+
+<div class="lbd-warning">Las herramientas cambian rápido. Los conceptos de estos apuntes se mantienen, pero los nombres de archivos, eventos y opciones varían de una herramienta a otra y de una versión a otra. Ante cualquier duda, manda la documentación de la herramienta que uses.</div>
+
+<!-- ---------- -->
+<h3>6.1 Archivo de instrucciones</h3>
+<p>Es un archivo Markdown que el agente lee al empezar cada sesión. Es la guía principal del harness: todo lo que el agente debe saber siempre sobre tu proyecto.</p>
+<p><code>AGENTS.md</code> es la convención abierta más extendida, y la leen directamente muchos agentes. Algunas herramientas usan además su propio nombre de archivo o una carpeta de reglas. Si en el equipo conviven varias herramientas, mantén un único <code>AGENTS.md</code> y haz que los demás archivos apunten a él. Así no tienes tres versiones que se contradicen.</p>
+
+<h4>Dónde se coloca</h4>
+<div class="lbd-table-wrap"><table>
+  <thead><tr><th>Ubicación</th><th>Alcance</th><th>Se comparte en Git</th></tr></thead>
+  <tbody>
+    <tr><td>En la raíz del repo</td><td>Todo el proyecto</td><td>Sí</td></tr>
+    <tr><td>En una subcarpeta</td><td>Esa carpeta. Normalmente manda el archivo más cercano</td><td>Sí</td></tr>
+    <tr><td>En tu carpeta de usuario</td><td>Todos tus proyectos, solo en tu máquina. Depende de la herramienta</td><td>No</td></tr>
+  </tbody>
+</table></div>
+
+<h4>Qué poner</h4>
+<ul>
+  <li><strong>Comandos:</strong> cómo se instala, se ejecutan los tests, se lanza el análisis estático y el linter.</li>
+  <li><strong>Estructura:</strong> qué hay en cada carpeta y qué dependencias se permiten entre ellas.</li>
+  <li><strong>Convenciones:</strong> las que no son obvias y el agente no adivinaría. Por ejemplo, que las fechas se guardan siempre en UTC.</li>
+  <li><strong>Reglas de negocio:</strong> una línea por regla, como «una reserva solo se puede cancelar hasta 2 horas antes de la clase». El detalle va en <code>docs/</code>.</li>
+  <li><strong>Forma de trabajar:</strong> planificar antes de editar, tests primero, no dar nada por hecho sin ejecutar los tests.</li>
+</ul>
+
+<h4>Qué no poner</h4>
+<ul>
+  <li>Lo que el agente ya sabe: cómo funciona tu lenguaje de programación, buenas prácticas genéricas.</li>
+  <li>Documentación larga copiada entera. Mejor enlazarla con su ruta y pedir al agente que la lea cuando la necesite.</li>
+  <li>Secretos, contraseñas o claves.</li>
+  <li>Reglas que puede comprobar una herramienta. Esas van a tests, linter o hooks.</li>
+</ul>
+
+<p>Muchas herramientas tienen un comando que analiza el repositorio y genera un primer archivo de instrucciones. Es un borrador: léelo y recorta.</p>
+
+<div class="lbd-success">Prueba de calidad: abre una sesión nueva y pregunta cómo se lanzan los tests y cuál es alguna de las reglas de negocio del proyecto. Si el agente no responde bien a la primera, el archivo de instrucciones no está cumpliendo su función.</div>
+
+<!-- ---------- -->
+<h3>6.2 Modos de trabajo y modo plan</h3>
+<p>La mayoría de agentes permiten elegir cuánta autonomía tiene. Los nombres cambian, pero los niveles se parecen.</p>
+<div class="lbd-table-wrap"><table>
+  <thead><tr><th>Modo</th><th>Qué hace</th><th>Cuándo usarlo</th></tr></thead>
+  <tbody>
+    <tr><td>Supervisado</td><td>Pregunta antes de editar o ejecutar algo no permitido</td><td>Por defecto, mientras aprendes</td></tr>
+    <tr><td>Edición automática</td><td>Edita archivos sin preguntar</td><td>Cuando el harness ya verifica bien cada cambio</td></tr>
+    <tr><td>Plan</td><td>Solo lee y propone un plan. No edita</td><td>Al empezar cualquier funcionalidad</td></tr>
+  </tbody>
+</table></div>
+<p>El modo plan es una guía muy barata. Te deja corregir el diseño antes de que exista código. Corregir un plan cuesta un minuto; corregir una implementación entera cuesta mucho más. Si tu herramienta no tiene modo plan, pídelo en el encargo: «propón un plan y no edites nada hasta que lo apruebe».</p>
+
+<!-- ---------- -->
+<h3>6.3 Permisos</h3>
+<p>Los permisos definen qué puede hacer el agente sin preguntar, qué tiene que preguntar y qué no puede hacer nunca. Suelen tener dos niveles: uno del proyecto, que se sube a Git y comparte el equipo, y otro personal, que se queda en tu máquina.</p>
+<p>La idea es la misma en todas las herramientas: tres listas. Lo permitido se hace sin preguntar. Lo marcado para preguntar siempre pide confirmación. Lo prohibido se bloquea, aunque otra regla lo permita.</p>
+<pre><code># Ejemplo conceptual. La sintaxis real depende de la herramienta.
+permitir:  ejecutar los tests, ejecutar el análisis estático
+preguntar: git commit
+prohibir:  leer archivos de secretos, git push</code></pre>
+<p>Algunas herramientas añaden un <em>sandbox</em>: el agente trabaja en un entorno aislado, sin red o sin acceso fuera de la carpeta del proyecto. Es otro límite, y de los más eficaces.</p>
+<div class="lbd-note">Permitir los comandos de verificación es importante. Si el agente tiene que pedir permiso cada vez que lanza los tests, acabarás aprobando sin leer, o el agente dejará de lanzarlos.</div>
+
+<!-- ---------- -->
+<h3>6.4 Comandos reutilizables</h3>
+<p>Un comando reutilizable es un encargo guardado en un archivo, normalmente Markdown. Se lanza con una palabra, por ejemplo <code>/nueva-funcionalidad</code>, y suele admitir argumentos: lo que escribes después del comando se inserta en el texto.</p>
+<p>Sirven para fijar flujos que repites. En lugar de recordar cada vez «planifica, tests primero, ejecuta», lo escribes una vez y lo lanzas con una palabra.</p>
+<pre><code>/nueva-funcionalidad exportar el historial de pedidos a un archivo CSV</code></pre>
+<p>El archivo del comando contiene los pasos fijos: explorar, planificar, escribir los tests, implementar y verificar. Lo que escribes detrás del nombre es la funcionalidad concreta de cada vez.</p>
+<p>Si tu herramienta no tiene comandos, guarda el encargo en <code>docs/encargos/</code> y pide al agente que lo siga. Pierdes comodidad, pero no la idea.</p>
+
+<!-- ---------- -->
+<h3>6.5 Skills</h3>
+<p>Una skill es una carpeta con un archivo <code>SKILL.md</code> y, si hace falta, recursos: plantillas, scripts, ejemplos. El <code>SKILL.md</code> empieza con un nombre y una descripción. Este formato lo admiten ya varias herramientas.</p>
+<p>La diferencia con el archivo de instrucciones es cuándo se cargan. El archivo de instrucciones entra siempre. De una skill, el agente solo ve la descripción hasta que la tarea encaja; entonces lee el resto. Así puedes tener mucho conocimiento especializado sin llenar el contexto.</p>
+<div class="lbd-table-wrap"><table>
+  <thead><tr><th>Usa el archivo de instrucciones para…</th><th>Usa una skill para…</th></tr></thead>
+  <tbody>
+    <tr><td>Lo que aplica a casi todas las tareas</td><td>Lo que aplica a un tipo concreto de tarea</td></tr>
+    <tr><td>Comandos, estructura, convenciones</td><td>Cómo escribir migraciones, cómo generar informes, cómo documentar una API</td></tr>
+  </tbody>
+</table></div>
+
+<!-- ---------- -->
+<h3>6.6 Subagentes</h3>
+<p>Un subagente es otro agente al que el principal delega una tarea. Tiene su propio contexto, sus propias instrucciones y su propia lista de herramientas. Se suele definir en un archivo con una cabecera que indica nombre, descripción y herramientas permitidas.</p>
+<p>Tienen dos ventajas en un harness:</p>
+<ul>
+  <li><strong>Contexto limpio.</strong> El subagente no arrastra la conversación del principal. Un revisor que no ha visto cómo se escribió el código lo revisa con ojos nuevos.</li>
+  <li><strong>Herramientas limitadas.</strong> Un revisor que solo puede leer y buscar no puede «arreglar» lo que encuentra. Solo informa.</li>
+</ul>
+<pre><code># Ejemplo conceptual. El formato exacto depende de la herramienta.
+---
+name: revisor
+description: Revisa código contra AGENTS.md y los casos de uso.
+tools: leer, buscar
+---
+Eres un revisor exigente. No editas archivos. …</code></pre>
+<p>Si tu herramienta no tiene subagentes, el efecto se consigue a mano: abre una sesión nueva, sin el historial, y pídele la revisión con las mismas instrucciones.</p>
+
+<!-- ---------- -->
+<h3>6.7 Hooks</h3>
+<p>Un hook es un comando que el agente ejecuta solo en un momento concreto de su trabajo. Es la pieza que convierte un sensor en automático: nadie tiene que acordarse de lanzarlo.</p>
+
+<h4>Momentos habituales</h4>
+<div class="lbd-table-wrap"><table>
+  <thead><tr><th>Momento</th><th>Uso típico</th></tr></thead>
+  <tbody>
+    <tr><td>Antes de una acción</td><td>Bloquear la edición de archivos protegidos o un comando peligroso</td></tr>
+    <tr><td>Después de editar un archivo</td><td>Formatear o lanzar el análisis estático</td></tr>
+    <tr><td>Al enviar tú un mensaje</td><td>Añadir contexto o validar el encargo</td></tr>
+    <tr><td>Cuando el agente da la tarea por terminada</td><td>Lanzar los tests antes de aceptar el «hecho»</td></tr>
+    <tr><td>Al empezar una sesión</td><td>Cargar el estado del proyecto</td></tr>
+  </tbody>
+</table></div>
+
+<h4>Lo importante: que el error vuelva al agente</h4>
+<p>Un hook solo es un sensor completo si su resultado llega al agente. Si los tests fallan y el agente no se entera, el hook solo te avisa a ti. Cada herramienta tiene su mecanismo para devolver el error: un código de salida concreto, una salida en un formato determinado. Comprueba en su documentación cómo se bloquea una acción y cómo se le pasa el mensaje.</p>
+
+<h4>La lógica, en el proyecto</h4>
+<p>Pon las comprobaciones en tareas o scripts del proyecto, con el gestor de tareas o el sistema de construcción que use tu lenguaje, y haz que el hook solo los llame. Así funcionan con cualquier agente, con cualquier persona del equipo y en la integración continua.</p>
+<pre><code># Ejemplo conceptual. Cada proyecto usa sus propias herramientas.
+verificar-rapido   formato + análisis estático
+verificar          verificar-rapido + linter + todos los tests</code></pre>
+<p>Tras cada edición, el hook llama a <code>verificar-rapido</code>. Al terminar la tarea, a <code>verificar</code>. Si cambias de herramienta, solo cambias dos líneas de configuración.</p>
+
+<div class="lbd-warning">
+  <p><strong>Precauciones con los hooks</strong></p>
+  <ul>
+    <li>Un hook de fin de tarea que siempre falla deja al agente en bucle. Si pasa, interrúmpelo y revisa el test.</li>
+    <li>Los hooks lentos ralentizan cada paso. Tras cada edición, comprobaciones rápidas. Al terminar, las completas.</li>
+    <li>Un hook ejecuta comandos en tu máquina con tus permisos. Revisa los hooks de un proyecto antes de usarlos.</li>
+    <li>Si el equipo usa sistemas operativos distintos, llama a las tareas del proyecto en lugar de encadenar comandos de terminal.</li>
+  </ul>
+</div>
+
+<!-- ---------- -->
+<h3>6.8 Tests, análisis estático y linter</h3>
+<p>Son los sensores más importantes y no dependen del agente: son de tu proyecto. Sirven igual con cualquier herramienta. Un harness sin ellos no tiene con qué comprobar nada.</p>
+<ul>
+  <li><strong>Análisis estático estricto.</strong> El compilador, el comprobador de tipos o el analizador de tu lenguaje, en su modo más exigente. Detecta errores sin ejecutar el código.</li>
+  <li><strong>Linter.</strong> Reglas que expresen tus convenciones. Cada convención que puedas pasar al linter sale del archivo de instrucciones.</li>
+  <li><strong>Tests de comportamiento.</strong> Un test por regla de negocio. Prueban qué hace el código, no cómo lo hace por dentro.</li>
+  <li><strong>Tests de arquitectura.</strong> Comprueban reglas sobre la estructura del código. Por ejemplo, que la lógica de negocio no llama directamente a la base de datos, o que la interfaz no hace cálculos. Convierten una convención de estructura en un sensor.</li>
+</ul>
+<div class="lbd-info">Ojo con los tests que escribe el propio agente. Pueden pasar porque prueban poco. Revisa siempre los tests antes que la implementación: son la especificación.</div>
+
+<!-- ---------- -->
+<h3>6.9 MCP</h3>
+<p>MCP (Model Context Protocol) es un estándar abierto para conectar el agente con servicios externos: bases de datos, gestores de tareas, navegadores. Lo admiten la mayoría de agentes. Amplía lo que el agente puede ver y hacer. No se trata en estos apuntes, pero forma parte del harness en proyectos reales.</p>
+
+
+<!-- ============================================================ -->
+<h2 id="s7">7. Flujo de trabajo con harness</h2>
+
+<p>Con el harness montado, cada funcionalidad sigue el mismo flujo.</p>
+<ol>
+  <li><strong>Explorar.</strong> El agente lee el código y la documentación relevante. Todavía no edita.</li>
+  <li><strong>Planificar.</strong> En modo plan, propone archivos a tocar y tests a escribir. Tú revisas y corriges.</li>
+  <li><strong>Tests primero.</strong> Escribe un test por criterio de aceptación. Los ejecuta y comprueba que fallan.</li>
+  <li><strong>Implementar.</strong> Escribe lo mínimo para que pasen. Los hooks lanzan las comprobaciones rápidas tras cada edición.</li>
+  <li><strong>Verificar.</strong> Al terminar, el hook de fin de tarea lanza los tests. Si fallan, sigue trabajando.</li>
+  <li><strong>Revisar.</strong> El subagente revisor busca lo que los tests no ven.</li>
+  <li><strong>Mejorar el harness.</strong> Si algo falló, añades la regla, el test o el hook que lo evita.</li>
+  <li><strong>Commit.</strong> Con un mensaje claro. Si cambió el harness, se indica.</li>
+</ol>
+
+<h3>Por qué tests primero con agentes</h3>
+<p>Con un agente, los tests escritos antes son tu especificación. Los revisas tú, que conoces las reglas del negocio, y luego el agente trabaja hasta cumplirlos. Si escribe primero la implementación, tiende a escribir tests que confirman lo que ya hizo, incluidos sus errores.</p>
+
+<h3>Ejemplo completo: cupones de descuento</h3>
+<p>Una tienda online quiere añadir cupones. La regla de negocio es esta: un cupón da un 10 % de descuento, solo vale en pedidos de 50 € o más y deja de valer en su fecha de caducidad. Así se desarrolla con el flujo anterior.</p>
+<div class="lbd-table-wrap"><table>
+  <thead><tr><th>Paso</th><th>Qué ocurre</th></tr></thead>
+  <tbody>
+    <tr><td>Plan</td><td>El agente propone dónde calcular el descuento y qué archivos tocar. Ves que no ha pensado en los cupones caducados y se lo pides.</td></tr>
+    <tr><td>Tests</td><td>Cuatro tests, uno por caso: pedido de 60 € con cupón válido, pedido de 40 €, cupón caducado y cupón que no existe. Fallan porque aún no hay implementación.</td></tr>
+    <tr><td>Implementación</td><td>El agente trata el importe como texto en lugar de como número. El análisis estático falla, el agente lee el error y lo corrige.</td></tr>
+    <tr><td>Fin de tarea</td><td>Un test falla: un pedido de 50 € justos no recibe el descuento. El agente cambia «mayor que» por «mayor o igual que» antes de terminar.</td></tr>
+    <tr><td>Revisión</td><td>El revisor detecta que el mismo cupón se puede aplicar dos veces al mismo pedido. No había ningún test para ese caso.</td></tr>
+    <tr><td>Harness</td><td>Añades el test que faltaba y una línea al <code>AGENTS.md</code>: «cada regla de negocio tiene tests, incluidos los casos límite».</td></tr>
+  </tbody>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="s8">8. Mantener el harness</h2>
+
+<p>Un harness no se termina nunca. Crece con el proyecto y hay que cuidarlo.</p>
+
+<h3>El registro del harness</h3>
+<p>Mantén un archivo, por ejemplo <code>docs/registro-harness.md</code>, con una línea por cada fallo del agente y el cambio que hiciste. Sirve para entender por qué existe cada regla y para decidir cuáles sobran.</p>
+<pre><code>| Fecha      | Fallo del agente                          | Cambio en el harness               |
+|------------|-------------------------------------------|------------------------------------|
+| 2026-10-29 | Permitió cancelar reservas fuera de plazo | Regla en AGENTS.md + test          |
+| 2026-10-30 | Dio por terminado sin pasar los tests     | Hook de fin de tarea con los tests |</code></pre>
+
+<h3>Dónde va cada corrección</h3>
+<div class="lbd-table-wrap"><table>
+  <thead><tr><th>Si el fallo es…</th><th>La corrección va en…</th></tr></thead>
+  <tbody>
+    <tr><td>Algo que el agente no sabía</td><td>Archivo de instrucciones o documentación enlazada</td></tr>
+    <tr><td>Algo que se puede comprobar automáticamente</td><td>Test, regla del linter o hook</td></tr>
+    <tr><td>Un flujo que se salta pasos</td><td>Comando reutilizable</td></tr>
+    <tr><td>Conocimiento de un tipo concreto de tarea</td><td>Skill</td></tr>
+    <tr><td>Algo peligroso</td><td>Permiso prohibido o hook antes de la acción</td></tr>
+    <tr><td>Un problema de diseño que ningún test detecta</td><td>Instrucciones del subagente revisor</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Revisiones periódicas</h3>
+<ul>
+  <li><strong>Contradicciones.</strong> Con el tiempo, guías y sensores pueden contradecirse. Revisa que el archivo de instrucciones y el linter digan lo mismo.</li>
+  <li><strong>Reglas muertas.</strong> Si una regla ya la comprueba un test, quítala del archivo de instrucciones.</li>
+  <li><strong>Tamaño.</strong> Si el archivo de instrucciones pasa de 100 líneas, algo sobra o debería ser una skill.</li>
+  <li><strong>El agente como ayudante.</strong> El propio agente puede proponer reglas a partir de los errores, escribir tests de arquitectura o crear reglas de linter.</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="s9">9. Errores frecuentes</h2>
+<div class="lbd-table-wrap"><table>
+  <thead><tr><th>Error</th><th>Por qué es un problema</th><th>Qué hacer</th></tr></thead>
+  <tbody>
+    <tr><td>Archivo de instrucciones enorme</td><td>Llena el contexto y las reglas se diluyen</td><td>Recortar. Enlazar el detalle. Pasar reglas a herramientas</td></tr>
+    <tr><td>Arreglar a mano el error del agente</td><td>El error vuelve en la siguiente sesión</td><td>Arreglar el harness y repetir</td></tr>
+    <tr><td>Aceptar los tests sin leerlos</td><td>Tests flojos dan falsa seguridad</td><td>Revisar los tests antes que la implementación</td></tr>
+    <tr><td>Saltarse el plan</td><td>Los errores de diseño se descubren tarde</td><td>Modo plan en toda funcionalidad nueva</td></tr>
+    <tr><td>Permisos demasiado abiertos</td><td>El agente puede tocar secretos o publicar cambios</td><td>Prohibir leer secretos y hacer <code>git push</code> desde el principio</td></tr>
+    <tr><td>Permisos demasiado cerrados</td><td>Apruebas sin leer por cansancio</td><td>Permitir los comandos de verificación</td></tr>
+    <tr><td>Hooks lentos tras cada edición</td><td>Cada paso tarda demasiado</td><td>Rápidos tras editar, completos al terminar</td></tr>
+    <tr><td>Sesiones eternas</td><td>El contexto se llena y el agente olvida lo del principio</td><td>Una sesión por tarea. Limpiar el contexto o abrir sesión nueva al cambiar de tarea</td></tr>
+  </tbody>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="s10">10. Glosario</h2>
+<dl>
+  <dt>Agente</dt><dd>Modelo de lenguaje que trabaja en bucle usando herramientas: lee, decide, actúa y vuelve a decidir.</dd>
+  <dt>Harness</dt><dd>Todo lo que rodea al modelo en un agente: instrucciones, herramientas, límites y comprobaciones.</dd>
+  <dt>Harness engineering</dt><dd>Práctica de diseñar y mantener el harness para que el resultado del agente sea fiable.</dd>
+  <dt>Ventana de contexto</dt><dd>Cantidad de texto que el modelo puede tener en cuenta a la vez. Es limitada.</dd>
+  <dt>Guía</dt><dd>Pieza del harness que actúa antes de que el agente haga algo. Orienta su comportamiento.</dd>
+  <dt>Sensor</dt><dd>Pieza del harness que actúa después. Comprueba el resultado y, si está conectada, devuelve el error al agente.</dd>
+  <dt>Límite</dt><dd>Pieza del harness que impide acciones concretas.</dd>
+  <dt>Archivo de instrucciones</dt><dd>Archivo Markdown con instrucciones persistentes que el agente carga en cada sesión. <code>AGENTS.md</code> es la convención abierta más extendida.</dd>
+  <dt>Hook</dt><dd>Comando que el agente ejecuta automáticamente en un momento concreto del trabajo del agente.</dd>
+  <dt>Subagente</dt><dd>Agente secundario con contexto, instrucciones y herramientas propias.</dd>
+  <dt>Skill</dt><dd>Paquete de instrucciones y recursos que el agente carga solo cuando la tarea lo necesita.</dd>
+  <dt>Modo plan</dt><dd>Modo en el que el agente solo lee y propone, sin editar.</dd>
+  <dt>Vibe coding</dt><dd>Programar pidiendo código a una IA y aceptándolo sin una estructura de verificación. Útil para prototipos, frágil para proyectos.</dd>
+</dl>
+
+<!-- ============================================================ -->
+<h2 id="s11">11. Para saber más</h2>
+<ul>
+  <li><a href="https://addyosmani.com/blog/agent-harness-engineering/">Addy Osmani · Agent Harness Engineering</a>. Visión general y el hábito de tratar cada error como una señal permanente.</li>
+  <li><a href="https://humanlayer.dev/blog/skill-issue-harness-engineering-for-coding-agents">HumanLayer · Skill Issue: Harness Engineering for Coding Agents</a>. Relación con el context engineering y uso práctico de los archivos de instrucciones.</li>
+  <li><a href="https://agentic-ai.readthedocs.io/en/latest/AgentHarness/harness-engineering">Agentic AI · Harness Engineering</a>. Guías y sensores, harness del fabricante y del usuario.</li>
+  <li><a href="https://tianpan.co/blog/2026-02-17-harness-engineering-agent-first-software-development">Tian Pan · Harness Engineering</a>. Por qué las instrucciones largas no escalan y el repositorio como canal.</li>
+  <li><a href="https://agents.md">AGENTS.md</a>. La convención abierta para archivos de instrucciones y la lista de herramientas que la admiten.</li>
+  <li><a href="https://modelcontextprotocol.io">Model Context Protocol</a>. El estándar para conectar agentes con servicios externos.</li>
+  <li>La documentación de tu herramienta. Es la referencia vigente de permisos, hooks, skills y subagentes.</li>
+</ul>
+
+</main>
+
+<footer class="lbd-footer">
+  <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4gPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGlkPSJMYXllcl8xIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE5Ni4wOCIgdmlld0JveD0iMCAwIDMwMCAxOTYuMDgiPjxwYXRoIGQ9Ik0xOC42Miw2Mi4wN2gyNC4zOXYxNC4zN0gwVjBIMTguNjJWNjIuMDdaIiBmaWxsPSIjZmZmIj48L3BhdGg+PHBhdGggZD0iTTEwOC44OSw1MC41M2gtNDIuMTRjLjI5LDMuNzgsMS41MSw2LjY2LDMuNjUsOC42NiwyLjE0LDIsNC43NywyLjk5LDcuOSwyLjk5LDQuNjQsMCw3Ljg4LTEuOTYsOS42OS01Ljg4aDE5LjgyYy0xLjAyLDMuOTktMi44NSw3LjU5LTUuNSwxMC43OC0yLjY1LDMuMi01Ljk3LDUuNy05Ljk2LDcuNTEtMy45OSwxLjgyLTguNDYsMi43Mi0xMy4zOSwyLjcyLTUuOTUsMC0xMS4yNS0xLjI3LTE1LjktMy44MS00LjY1LTIuNTQtOC4yOC02LjE3LTEwLjg5LTEwLjg5LTIuNjEtNC43Mi0zLjkyLTEwLjI0LTMuOTItMTYuNTVzMS4yOS0xMS44MywzLjg3LTE2LjU1YzIuNTgtNC43Miw2LjE5LTguMzUsMTAuODQtMTAuODksNC42NS0yLjU0LDkuOTgtMy44MSwxNi4wMS0zLjgxczExLjExLDEuMjMsMTUuNjgsMy43YzQuNTcsMi40Nyw4LjE1LDUuOTksMTAuNzMsMTAuNTYsMi41OCw0LjU3LDMuODcsOS45MSwzLjg3LDE2LjAxLDAsMS43NC0uMTEsMy41Ni0uMzMsNS40NFptLTE4LjczLTEwLjM0YzAtMy4xOS0xLjA5LTUuNzMtMy4yNy03LjYyLTIuMTgtMS44OS00LjktMi44My04LjE3LTIuODNzLTUuNzYsLjkxLTcuODksMi43MmMtMi4xNCwxLjgyLTMuNDcsNC4zOS0zLjk4LDcuNzNoMjMuM1oiIGZpbGw9IiNmZmYiPjwvcGF0aD48cGF0aCBkPSJNMTE4Ljg2LDI5LjUxYzIuMzYtNC43Miw1LjU3LTguMzUsOS42NC0xMC44OSw0LjA2LTIuNTQsOC42LTMuODEsMTMuNjEtMy44MSw0LjI4LDAsOC4wNCwuODcsMTEuMjcsMi42MSwzLjIzLDEuNzQsNS43Miw0LjAzLDcuNDYsNi44NlYxNS42OGgxOC42MnY2MC43NmgtMTguNjJ2LTguNmMtMS44MiwyLjgzLTQuMzQsNS4xMi03LjU3LDYuODYtMy4yMywxLjc0LTYuOTksMi42MS0xMS4yNywyLjYxLTQuOTQsMC05LjQ0LTEuMjktMTMuNS0zLjg3LTQuMDctMi41OC03LjI4LTYuMjQtOS42NC0xMS0yLjM2LTQuNzUtMy41NC0xMC4yNS0zLjU0LTE2LjVzMS4xOC0xMS43MiwzLjU0LTE2LjQ0Wm0zOC4xMSw1LjU1Yy0yLjU4LTIuNjgtNS43Mi00LjAzLTkuNDItNC4wM3MtNi44NCwxLjMyLTkuNDIsMy45N2MtMi41OCwyLjY1LTMuODcsNi4zLTMuODcsMTAuOTRzMS4yOSw4LjMzLDMuODcsMTEuMDVjMi41OCwyLjcyLDUuNzIsNC4wOCw5LjQyLDQuMDhzNi44NC0xLjM0LDkuNDItNC4wM2MyLjU4LTIuNjksMy44Ny02LjM1LDMuODctMTFzLTEuMjktOC4zMS0zLjg3LTExWiIgZmlsbD0iI2ZmZiI+PC9wYXRoPjxwYXRoIGQ9Ik0yMTkuNzUsMTcuOTFjMy4yNy0xLjkyLDYuOS0yLjg5LDEwLjg5LTIuODl2MTkuNzFoLTUuMTJjLTQuNjUsMC04LjEzLDEtMTAuNDUsMy0yLjMyLDItMy40OCw1LjUtMy40OCwxMC41MXYyOC4yaC0xOC42MlYxNS42OGgxOC42MnYxMC4xM2MyLjE4LTMuMzQsNC45LTUuOTcsOC4xNy03Ljg5WiIgZmlsbD0iI2ZmZiI+PC9wYXRoPjxwYXRoIGQ9Ik0yOTMuNjMsMjEuOTRjNC4yNSw0LjYxLDYuMzcsMTAuOTQsNi4zNywxOXYzNS41aC0xOC41MVY0My40NWMwLTQuMDYtMS4wNS03LjIyLTMuMTYtOS40Ny0yLjExLTIuMjUtNC45NC0zLjM4LTguNDktMy4zOHMtNi4zOSwxLjEzLTguNDksMy4zOGMtMi4xMSwyLjI1LTMuMTYsNS40MS0zLjE2LDkuNDd2MzNoLTE4LjYyVjE1LjY4aDE4LjYydjguMDZjMS44OS0yLjY5LDQuNDMtNC44MSw3LjYyLTYuMzcsMy4xOS0xLjU2LDYuNzktMi4zNCwxMC43OC0yLjM0LDcuMTEsMCwxMi43OSwyLjMxLDE3LjA0LDYuOTFaIiBmaWxsPSIjZmZmIj48L3BhdGg+PHBhdGggZD0iTTI2LjEzLDExMi44N2MzLjI3LTEuNzQsNy4wMS0yLjYxLDExLjIyLTIuNjEsNS4wMSwwLDkuNTUsMS4yNywxMy42MSwzLjgxLDQuMDYsMi41NCw3LjI4LDYuMTcsOS42NCwxMC44OSwyLjM2LDQuNzIsMy41NCwxMC4yLDMuNTQsMTYuNDRzLTEuMTgsMTEuNzQtMy41NCwxNi41Yy0yLjM2LDQuNzYtNS41Nyw4LjQyLTkuNjQsMTEtNC4wNywyLjU4LTguNiwzLjg3LTEzLjYxLDMuODctNC4yOCwwLTguMDItLjg1LTExLjIyLTIuNTYtMy4xOS0xLjctNS43LTMuOTctNy41MS02LjgxdjguNDlIMFY5MS4zMUgxOC42MnYyOC40MmMxLjc0LTIuODMsNC4yNS01LjEyLDcuNTEtNi44NlptMTUuMTksMTcuNTljLTIuNTgtMi42NS01Ljc2LTMuOTctOS41My0zLjk3cy02Ljg0LDEuMzQtOS40Miw0LjAzYy0yLjU4LDIuNjktMy44Nyw2LjM1LTMuODcsMTFzMS4yOSw4LjMxLDMuODcsMTFjMi41OCwyLjY5LDUuNzIsNC4wMyw5LjQyLDQuMDNzNi44Ni0xLjM2LDkuNDctNC4wOGMyLjYxLTIuNzIsMy45Mi02LjQxLDMuOTItMTEuMDVzLTEuMjktOC4yOS0zLjg3LTEwLjk0WiIgZmlsbD0iI2ZmZiI+PC9wYXRoPjxwb2x5Z29uIHBvaW50cz0iMTM2LjAxIDExMS4xMyAxMTUuODYgMTExLjEzIDEwMS45MiAxNDkuMTMgODcuODggMTExLjEzIDY3LjA4IDExMS4xMyA5MS44IDE2OS44MiA3OS45NiAxOTYuMDggOTkuODggMTk2LjA4IDEzNi4wMSAxMTEuMTMiIGZpbGw9IiNmZmYiPjwvcG9seWdvbj48cGF0aCBkPSJNMTQyLjU5LDEyNC45NmMyLjM2LTQuNzIsNS41Ny04LjM1LDkuNjQtMTAuODksNC4wNi0yLjU0LDguNi0zLjgxLDEzLjYxLTMuODEsMy45OSwwLDcuNjQsLjg0LDEwLjk0LDIuNSwzLjMsMS42Nyw1LjksMy45Miw3Ljc5LDYuNzV2LTI4LjJoMTguNjJ2ODAuNThoLTE4LjYydi04LjcxYy0xLjc0LDIuOS00LjIzLDUuMjMtNy40Niw2Ljk3LTMuMjMsMS43NC02Ljk5LDIuNjEtMTEuMjcsMi42MS01LjAxLDAtOS41NS0xLjI5LTEzLjYxLTMuODctNC4wNy0yLjU4LTcuMjgtNi4yNC05LjY0LTExLTIuMzYtNC43NS0zLjU0LTEwLjI1LTMuNTQtMTYuNXMxLjE4LTExLjcyLDMuNTQtMTYuNDRabTM4LjExLDUuNTVjLTIuNTgtMi42OS01LjcyLTQuMDMtOS40Mi00LjAzcy02Ljg0LDEuMzMtOS40MiwzLjk3Yy0yLjU4LDIuNjUtMy44Nyw2LjMtMy44NywxMC45NHMxLjI5LDguMzMsMy44NywxMS4wNWMyLjU4LDIuNzIsNS43Miw0LjA4LDkuNDIsNC4wOHM2Ljg0LTEuMzQsOS40Mi00LjAzYzIuNTgtMi42OSwzLjg3LTYuMzUsMy44Ny0xMXMtMS4yOS04LjMxLTMuODctMTFaIiBmaWxsPSIjZmY0OTUwIj48L3BhdGg+PHBhdGggZD0iTTIyNy40NCwxNjkuMTZjLTQuNDktMi40LTguMDItNS44My0xMC41OS0xMC4yOC0yLjU3LTQuNDUtMy44Ni05LjY2LTMuODYtMTUuNjNzMS4zLTExLjA5LDMuOTEtMTUuNThjMi42LTQuNDksNi4xNy03LjkzLDEwLjY5LTEwLjMzLDQuNTItMi40LDkuNi0zLjYsMTUuMjItMy42czEwLjY5LDEuMiwxNS4yMiwzLjZjNC41MiwyLjQsOC4wOSw1Ljg0LDEwLjY5LDEwLjMzLDIuNiw0LjQ5LDMuOTEsOS42OCwzLjkxLDE1LjU4cy0xLjMyLDExLjA5LTMuOTYsMTUuNThjLTIuNjQsNC40OS02LjI0LDcuOTMtMTAuOCwxMC4zMy00LjU2LDIuNC05LjY1LDMuNi0xNS4yNywzLjZzLTEwLjY4LTEuMi0xNS4xNy0zLjZabTIzLjc1LTE1LjMyYzIuMzYtMi40NywzLjU1LTYsMy41NS0xMC41OXMtMS4xNS04LjEyLTMuNDQtMTAuNTljLTIuMy0yLjQ3LTUuMTItMy43LTguNDgtMy43cy02LjI3LDEuMjItOC41MywzLjY1Yy0yLjI2LDIuNDMtMy4zOSw1Ljk4LTMuMzksMTAuNjRzMS4xMSw4LjEyLDMuMzQsMTAuNTljMi4yMywyLjQ3LDUuMDIsMy43LDguMzgsMy43czYuMjItMS4yMyw4LjU5LTMuN1oiIGZpbGw9IiNmZjQ5NTAiPjwvcGF0aD48cGF0aCBkPSJNMjE2Ljc5LDEwNS43OHYtMTQuNDdoNTIuMDN2MTQuNDdoLTUyLjAzWiIgZmlsbD0iI2ZmNDk1MCI+PC9wYXRoPjwvc3ZnPiA=" alt="Learnby-do">
+  Learnby-do · Centro de Alto Rendimiento en formación tecnológica de Cuatroochenta
+</footer>
+
+</body>
+</html>
